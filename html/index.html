@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="/css/style.css">
+    <title>Data base leaks</title>
+</head>
+
+<body>
+<div class = header>
+<h1 class = page-header>Data Base Leaks</h1>
+</div>
+<div class = page-body>
+<table class = main-table>
+    <!--border="1" width="100%"-->
+    <col style = "width:25%">
+    <col style = "width:10%">
+    <col style = "width:15%">
+    <col style = "width:10%">
+    <col style = "width:15%">
+    <col style = "width:15%">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Size</th>
+        <th>Date</th>
+        <th>Price</th>
+        <th>Buy</th>
+        <th>Source</th>
+    </tr>
+    </thead>
+    {{range . }}
+    <tr>
+        <td>{{.Name}}</td>
+        <td>{{.Size}}</td>
+        <td>{{.Date}}</td>
+        <td>{{.Price}}</td>
+        <td><a href={{.Buy}}>Link</a></td>
+        <td><a href={{.Source}}>Darknet</a></td>
+    </tr>
+    {{end}}
+</table>
+</div>
+</body>
+</html>
