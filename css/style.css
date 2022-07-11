@@ -1,5 +1,6 @@
 body {
-    font-family: "Times New Roman";
+    font-family: "sans-serif";
+    background: #232327;
 }
 .header{
     background-color: cornflowerblue;
@@ -10,14 +11,14 @@ body {
     color: #edf8f7;
     text-align: center;
 }
-.main-table{
+.main-table {
     table-layout: fixed;
     width: 100%;
-    color: #000000;
+    color: #F3F4F7;
     margin-bottom: 20px;
-    border: 1px solid #000000;
+    border: 5px solid #564983;
     border-collapse: collapse;
-    background-color: #dbdbcf;
+    text-align: left;
 }
 .main-table th {
     overflow: hidden;
@@ -25,10 +26,14 @@ body {
     text-overflow: ellipsis;
     font-weight: bold;
     padding: 5px;
-    background-color: #efefef;
-    border: 1px solid #dddddd;
 }
 .main-table td {
-    border: 1px solid #dddddd;
     padding: 5px;
+}
+
+.table-header{
+    background: #55608e;
+}
+.table-body{
+    background: linear-gradient(45deg, #7293a8, #786f9f);
 }

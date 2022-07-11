@@ -1,23 +1,19 @@
 package main
 
 import (
-	"fmt"
-	"os"
-	"os/signal"
-	"syscall"
+	"strings"
 	"time"
-
-	//	"time"
 
 	"github.com/kaoriEl/go-tdlib/client"
 	"github.com/kaoriEl/go-tdlib/tdlib"
+	//	"time"
+	_ "github.com/lib/pq"
 )
 
-func main() {
+func CollectInfoFromTelegram() {
+	var err error
 	client.SetLogVerbosityLevel(1)
 	client.SetFilePath("./errors.txt")
-
-	// Create new instance of client
 	client := client.NewClient(client.Config{
 		APIID:               "187786",
 		APIHash:             "e782045df67ba48e441ccb105da8fc85",
@@ -34,43 +30,44 @@ func main() {
 		IgnoreFileNames:     false,
 	})
 
-	// Handle Ctrl+C
-	ch := make(chan os.Signal, 2)
-	signal.Notify(ch, os.Interrupt, syscall.SIGTERM)
-	go func() {
-		<-ch
-		client.DestroyInstance()
-		os.Exit(1)
-	}()
-
-	// Wait while we get AuthorizationReady!
-	// Note: See authorization example for complete authorization sequence example
 	currentState, _ := client.Authorize()
 	for ; currentState.GetAuthorizationStateEnum() != tdlib.AuthorizationStateReadyType; currentState, _ = client.Authorize() {
 		time.Sleep(300 * time.Millisecond)
 	}
+	//var msgs []tdlib.Message
+	//for i := 0; i < 50; i++ {
+	//	msg, err := client.GetChatHistory(-1001678455451, 0, int32(-i), 50, false)
+	//	if err != nil {
+	//		break
+	//	}
+	//	msgs = append(msgs, msg.Messages[0])
+	//}
+	//mmm := (*msgs).(*tdlib.UpdateNewMessage)
 
-	// Create an filter function which will be used to filter out unwanted tdlib messages
 	eventFilter := func(msg *tdlib.TdMessage) bool {
 		updateMsg := (*msg).(*tdlib.UpdateNewMessage)
-		// For example, we want incoming messages from user with below id:
 		if updateMsg.Message.IsChannelPost == true {
-
 			result := updateMsg.Message.ChatID == -1001678455451
 			return result
 		}
 		return false
 	}
-	// Here we can add a receiver to retreive any message type we want
-	// We like to get UpdateNewMessage events and with a specific FilterFunc
+
+	link, err := client.CreateChatInviteLink(-1001678455451, 0, 0)
+	Chk(err)
+
+	rec.Source = link.InviteLink
 	receiver := client.AddEventReceiver(&tdlib.UpdateNewMessage{}, eventFilter, 5)
 	for newMsg := range receiver.Chan {
-		//fmt.Println(newMsg)
 		updateMsg := (newMsg).(*tdlib.UpdateNewMessage)
-		// We assume the message content is simple text: (should be more sophisticated for general use)
-		msgText := updateMsg.Message.Content.(*tdlib.MessageText)
-		fmt.Println("MsgText:  ", msgText.Text)
-		//fmt.Print("\n\n")
+		msg := updateMsg.Message.Content.(*tdlib.MessagePhoto)
+		rec.Name = strings.Split(msg.Caption.Text, "\n")[0]
+		rec.Date = strings.Split(msg.Caption.Text, "\n")[1]
+		rec.Size = strings.Split(msg.Caption.Text, "\n")[2]
+		rec.Price = strings.Split(msg.Caption.Text, "\n")[3]
+		rec.Buy = "127.0.0.1:3000"
+		_, err := insert(rec.Name, rec.Size, rec.Date, rec.Price, rec.Buy, rec.Source)
+		Chk(err)
+		//fmt.Printf("%v	|| %v || %v || %v || %v\n\n", rec.Name, rec.Date, rec.Size, rec.Price, rec.Source)
 	}
-
 }

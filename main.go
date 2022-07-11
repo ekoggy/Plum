@@ -65,27 +65,29 @@ func main() {
 	_, err = Database.Exec("CREATE TABLE IF NOT EXISTS " +
 		`database_leaks(` +
 		`"Name" varchar(500),"Size" varchar(15), "Date" varchar(15),
-		 "Price" varchar(10), "Buy" varchar(500), "Source" varchar(500))`)
+			 "Price" varchar(10), "Buy" varchar(500), "Source" varchar(500))`)
 	Chk(err)
+
+	//	go CollectInfoFromTelegram()
 
 	//maxNumb := CheckMaxNumber()
-
-	for i := 1; i < 5; i++ {
-		rec = Record{"", "", "", "", "", ""}
-		CollectPageDBInfo(i)
-		CollectBuyDBInfo(i)
-		if !RecordFull(rec) {
-			continue
-		}
-		_, err := insert(rec.Name, rec.Size,
-			rec.Date, rec.Price, rec.Buy, rec.Source)
-		Chk(err)
-		fmt.Println(i, "rows affected")
-	}
+	//
+	//	for i := 1; i < 5; i++ {
+	//		rec = Record{"", "", "", "", "", ""}
+	//		CollectPageDBInfo(i)
+	//		CollectBuyDBInfo(i)
+	//		if !RecordFull(rec) {
+	//			continue
+	//		}
+	//		_, err := insert(rec.Name, rec.Size,
+	//			rec.Date, rec.Price, rec.Buy, rec.Source)
+	//		Chk(err)
+	//		fmt.Println(i, "rows affected")
+	//	}
 	LocalView()
-	res, err := show("")
-	Chk(err)
-	Format(res)
+	//	res, err := show("")
+	//	Chk(err)
+	//	Format(res)
 }
 
 func RecordFull(r Record) bool {

@@ -7,9 +7,9 @@
 </head>
 
 <body>
-<div class = header>
+<!--<div class = header>
 <h1 class = page-header>Data Base Leaks</h1>
-</div>
+</div>-->
 <div class = page-body>
 <table class = main-table>
     <!--border="1" width="100%"-->
@@ -19,7 +19,7 @@
     <col style = "width:10%">
     <col style = "width:15%">
     <col style = "width:15%">
-    <thead>
+    <thead class = table-header>
     <tr>
         <th>Name</th>
         <th>Size</th>
@@ -29,16 +29,18 @@
         <th>Source</th>
     </tr>
     </thead>
+    <tbody class = table-body>
     {{range . }}
     <tr>
         <td>{{.Name}}</td>
         <td>{{.Size}}</td>
         <td>{{.Date}}</td>
         <td>{{.Price}}</td>
-        <td><a href={{.Buy}}>Link</a></td>
-        <td><a href={{.Source}}>Darknet</a></td>
+        <td><a href={{.Buy}}  style="color: #D3C8FF">Link</a></td>
+        <td><a href={{.Source}} style="color: #d3c8ff"> {{.TypeSource}}</a></td>
     </tr>
     {{end}}
+    </tbody>
 </table>
 </div>
 </body>
