@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -12,9 +13,10 @@ import (
 
 func CollectInfoFromTelegram() error {
 	var err error
+	var rec Record
 	client.SetLogVerbosityLevel(1)
 	client.SetFilePath("./errors.txt")
-	client := client.NewClient(client.Config{
+	cli := client.NewClient(client.Config{
 		APIID:               "187786",
 		APIHash:             "e782045df67ba48e441ccb105da8fc85",
 		SystemLanguageCode:  "en",
@@ -30,23 +32,30 @@ func CollectInfoFromTelegram() error {
 		IgnoreFileNames:     false,
 	})
 
-	currentState, err := client.Authorize()
+	currentState, err := cli.Authorize()
 	if err != nil {
 		return err
 	}
-	for ; currentState.GetAuthorizationStateEnum() != tdlib.AuthorizationStateReadyType; currentState, _ = client.Authorize() {
+	for ; currentState.GetAuthorizationStateEnum() != tdlib.AuthorizationStateReadyType; currentState, _ = cli.Authorize() {
 		time.Sleep(300 * time.Millisecond)
 	}
-	//var msgs []tdlib.Message
-	//for i := 0; i < 50; i++ {
-	//	msg, err := client.GetChatHistory(-1001678455451, 0, int32(-i), 50, false)
-	//	if err != nil {
-	//		break
-	//	}
-	//	msgs = append(msgs, msg.Messages[0])
-	//}
-	//mmm := (*msgs).(*tdlib.UpdateNewMessage)
 
+	last, err := cli.GetChatHistory(-1001678455451, 0, 0, 1, false)
+
+	msgs, err := cli.GetChatHistory(-1001678455451, last.Messages[0].ID, 0, 10, false)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(msgs.TotalCount)
+
+	for i := 0; i < int(msgs.TotalCount); i++ {
+		historyMsg := (msgs.Messages[i].Content).(*tdlib.MessagePhoto)
+		err := fillTheRecord(&rec, historyMsg, cli)
+		if err != nil {
+			return err
+		}
+	}
 	eventFilter := func(msg *tdlib.TdMessage) bool {
 		updateMsg := (*msg).(*tdlib.UpdateNewMessage)
 		if updateMsg.Message.IsChannelPost == true {
@@ -56,25 +65,33 @@ func CollectInfoFromTelegram() error {
 		return false
 	}
 
-	link, err := client.CreateChatInviteLink(-1001678455451, 0, 0)
-	if err != nil {
-		return err
-	}
-	var rec Record
-	rec.Source = link.InviteLink
-	receiver := client.AddEventReceiver(&tdlib.UpdateNewMessage{}, eventFilter, 5)
+	receiver := cli.AddEventReceiver(&tdlib.UpdateNewMessage{}, eventFilter, 5)
 	for newMsg := range receiver.Chan {
 		updateMsg := (newMsg).(*tdlib.UpdateNewMessage)
 		msg := updateMsg.Message.Content.(*tdlib.MessagePhoto)
-		rec.Name = strings.Split(msg.Caption.Text, "\n")[0]
-		rec.Date = strings.Split(msg.Caption.Text, "\n")[1]
-		rec.Size = strings.Split(msg.Caption.Text, "\n")[2]
-		rec.Price = strings.Split(msg.Caption.Text, "\n")[3]
-		rec.Buy = "127.0.0.1:3000"
-		_, err := insert(rec.Name, rec.Size, rec.Date, rec.Price, rec.Buy, rec.Source)
+		err := fillTheRecord(&rec, msg, cli)
 		if err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+func fillTheRecord(rec *Record, msg *tdlib.MessagePhoto, cli *client.Client) error {
+	rec.Name = strings.Split(msg.Caption.Text, "\n")[0]
+	rec.Date = strings.Split(msg.Caption.Text, "\n")[1]
+	rec.Size = strings.Split(msg.Caption.Text, "\n")[2]
+	rec.Price = strings.Split(msg.Caption.Text, "\n")[3]
+	entity := fmt.Sprintf("%s", msg.Caption.Entities[1].Type)
+	rec.Buy = entity[27 : len(entity)-1]
+	link, err := cli.CreateChatInviteLink(-1001678455451, 0, 0)
+	if err != nil {
+		return err
+	}
+	rec.Source = link.InviteLink
+	_, err = insert(rec.Name, rec.Size, rec.Date, rec.Price, rec.Buy, rec.Source)
+	if err != nil {
+		return err
 	}
 	return nil
 }
