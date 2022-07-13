@@ -17,8 +17,6 @@ type Record struct {
 	Source string
 }
 
-var rec Record
-
 var Database *sql.DB
 
 func Fatal(v interface{}) {
@@ -29,13 +27,6 @@ func Fatal(v interface{}) {
 func Chk(err error) {
 	if err != nil {
 		Fatal(err)
-	}
-}
-
-func Format(rs []Record) {
-	for _, v := range rs {
-		fmt.Printf("%s  %s  %s  %s  %s  %s\n", v.Name, v.Size,
-			v.Date, v.Price, v.Buy, v.Source)
 	}
 }
 
@@ -68,46 +59,16 @@ func main() {
 			 "Price" varchar(10), "Buy" varchar(500), "Source" varchar(500))`)
 	Chk(err)
 
-	//	go CollectInfoFromTelegram()
-
-	//maxNumb := CheckMaxNumber()
-	//
-	//	for i := 1; i < 5; i++ {
-	//		rec = Record{"", "", "", "", "", ""}
-	//		CollectPageDBInfo(i)
-	//		CollectBuyDBInfo(i)
-	//		if !RecordFull(rec) {
-	//			continue
-	//		}
-	//		_, err := insert(rec.Name, rec.Size,
-	//			rec.Date, rec.Price, rec.Buy, rec.Source)
-	//		Chk(err)
-	//		fmt.Println(i, "rows affected")
-	//	}
-	LocalView()
-	//	res, err := show("")
+	go func() {
+		err = CollectInfoFromTelegram()
+		Chk(err)
+	}()
+	//go func() {
+	//	err := CollectInfoFromDarknet()
 	//	Chk(err)
-	//	Format(res)
-}
-
-func RecordFull(r Record) bool {
-	if r.Name == "" {
-		return false
+	//}()
+	err = LocalView()
+	if err != nil {
+		Chk(err)
 	}
-	if r.Size == "" {
-		return false
-	}
-	if r.Date == "" {
-		return false
-	}
-	if r.Price == "" {
-		return false
-	}
-	if r.Buy == "" {
-		return false
-	}
-	if r.Source == "" {
-		return false
-	}
-	return true
 }

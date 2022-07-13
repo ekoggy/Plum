@@ -7,7 +7,7 @@ import (
 	"text/template"
 )
 
-type HTMLRecords struct {
+type htmlrecords struct {
 	Name       string
 	Size       string
 	Date       string
@@ -18,7 +18,7 @@ type HTMLRecords struct {
 }
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
-	var records []HTMLRecords
+	var records []htmlrecords
 	rows, err := Database.Query("select * from database_leaks")
 	if err != nil {
 		log.Println(err)
@@ -26,7 +26,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	defer rows.Close()
 
 	for rows.Next() {
-		p := HTMLRecords{}
+		p := htmlrecords{}
 		err := rows.Scan(&p.Name, &p.Size, &p.Date, &p.Price, &p.Buy, &p.Source)
 		if p.Source[4] == 's' {
 			p.TypeSource = "Telegram"
@@ -47,12 +47,20 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func LocalView() {
+func getUpdate(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func LocalView() error {
 
 	http.HandleFunc("/", IndexHandler)
 
 	http.Handle("/css/", http.StripPrefix("/css", http.FileServer(http.Dir("./css"))))
 
 	fmt.Println("Server is listening...")
-	http.ListenAndServe(":3000", nil)
+	err := http.ListenAndServe(":3000", nil)
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -10,7 +10,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func CollectInfoFromTelegram() {
+func CollectInfoFromTelegram() error {
 	var err error
 	client.SetLogVerbosityLevel(1)
 	client.SetFilePath("./errors.txt")
@@ -30,7 +30,10 @@ func CollectInfoFromTelegram() {
 		IgnoreFileNames:     false,
 	})
 
-	currentState, _ := client.Authorize()
+	currentState, err := client.Authorize()
+	if err != nil {
+		return err
+	}
 	for ; currentState.GetAuthorizationStateEnum() != tdlib.AuthorizationStateReadyType; currentState, _ = client.Authorize() {
 		time.Sleep(300 * time.Millisecond)
 	}
@@ -54,8 +57,10 @@ func CollectInfoFromTelegram() {
 	}
 
 	link, err := client.CreateChatInviteLink(-1001678455451, 0, 0)
-	Chk(err)
-
+	if err != nil {
+		return err
+	}
+	var rec Record
 	rec.Source = link.InviteLink
 	receiver := client.AddEventReceiver(&tdlib.UpdateNewMessage{}, eventFilter, 5)
 	for newMsg := range receiver.Chan {
@@ -67,7 +72,9 @@ func CollectInfoFromTelegram() {
 		rec.Price = strings.Split(msg.Caption.Text, "\n")[3]
 		rec.Buy = "127.0.0.1:3000"
 		_, err := insert(rec.Name, rec.Size, rec.Date, rec.Price, rec.Buy, rec.Source)
-		Chk(err)
-		//fmt.Printf("%v	|| %v || %v || %v || %v\n\n", rec.Name, rec.Date, rec.Size, rec.Price, rec.Source)
+		if err != nil {
+			return err
+		}
 	}
+	return nil
 }
