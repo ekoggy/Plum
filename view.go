@@ -47,10 +47,6 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getUpdate(w http.ResponseWriter, r *http.Request) {
-
-}
-
 func LocalView() error {
 
 	http.HandleFunc("/", IndexHandler)

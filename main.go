@@ -63,11 +63,11 @@ func main() {
 		err = CollectInfoFromTelegram()
 		Chk(err)
 	}()
-	//go func() {
-	//	err := CollectInfoFromDarknet()
-	//	Chk(err)
-	//}()
-	err = LocalView()
+	go func() {
+		err := LocalView()
+		Chk(err)
+	}()
+	err = CollectInfoFromDarknet()
 	if err != nil {
 		Chk(err)
 	}
