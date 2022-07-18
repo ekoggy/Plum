@@ -1,4 +1,4 @@
-package main
+package postgre
 
 func IsExist(Name string) (bool, error) {
 	response, err := Database.Query("SELECT EXISTS (SELECT * FROM database_leaks WHERE \"Name\" = $1)",
