@@ -55,7 +55,6 @@ func getSomeRecords(startRecord int, amount int) error {
 			continue
 		}
 		_, err = insert(rec.Name, rec.Size, rec.Date, rec.Price, rec.Buy, rec.Source)
-		fmt.Println(rec)
 	}
 	return nil
 }

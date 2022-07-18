@@ -6,6 +6,11 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/sasbury/mini"
 	"os"
+
+	"darknet"
+	"postgre"
+	"telegram"
+	"view"
 )
 
 type Record struct {
@@ -44,6 +49,9 @@ func Params() string {
 		cfg.String("user", "Hacker"),
 		cfg.String("pass", "Compl3xity1_"),
 	)
+
+	fmt.Println(info)
+
 	return info
 }
 
@@ -64,10 +72,10 @@ func main() {
 		Chk(err)
 	}()
 	go func() {
-		err := LocalView()
+		err := CollectInfoFromDarknet()
 		Chk(err)
 	}()
-	err = CollectInfoFromDarknet()
+	err = LocalView()
 	if err != nil {
 		Chk(err)
 	}

@@ -7,8 +7,6 @@ import (
 
 	"github.com/kaoriEl/go-tdlib/client"
 	"github.com/kaoriEl/go-tdlib/tdlib"
-	//	"time"
-	_ "github.com/lib/pq"
 )
 
 func CollectInfoFromTelegram() error {
@@ -46,8 +44,6 @@ func CollectInfoFromTelegram() error {
 	if err != nil {
 		return err
 	}
-
-	fmt.Println(msgs.TotalCount)
 
 	for i := 0; i < int(msgs.TotalCount); i++ {
 		historyMsg := (msgs.Messages[i].Content).(*tdlib.MessagePhoto)
