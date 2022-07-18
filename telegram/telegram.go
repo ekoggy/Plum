@@ -5,13 +5,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ekoggy/Plum/postgre"
 	"github.com/kaoriEl/go-tdlib/client"
 	"github.com/kaoriEl/go-tdlib/tdlib"
 )
 
 func CollectInfoFromTelegram() error {
 	var err error
-	var rec Record
+	var rec postgre.Record
 	client.SetLogVerbosityLevel(1)
 	client.SetFilePath("./errors.txt")
 	cli := client.NewClient(client.Config{
@@ -73,7 +74,7 @@ func CollectInfoFromTelegram() error {
 	return nil
 }
 
-func fillTheRecord(rec *Record, msg *tdlib.MessagePhoto, cli *client.Client) error {
+func fillTheRecord(rec *postgre.Record, msg *tdlib.MessagePhoto, cli *client.Client) error {
 	rec.Name = strings.Split(msg.Caption.Text, "\n")[0]
 	rec.Date = strings.Split(msg.Caption.Text, "\n")[1]
 	rec.Size = strings.Split(msg.Caption.Text, "\n")[2]
@@ -85,7 +86,7 @@ func fillTheRecord(rec *Record, msg *tdlib.MessagePhoto, cli *client.Client) err
 		return err
 	}
 	rec.Source = link.InviteLink
-	_, err = insert(rec.Name, rec.Size, rec.Date, rec.Price, rec.Buy, rec.Source)
+	_, err = postgre.Insert(rec.Name, rec.Size, rec.Date, rec.Price, rec.Buy, rec.Source)
 	if err != nil {
 		return err
 	}

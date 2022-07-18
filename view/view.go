@@ -2,6 +2,7 @@ package view
 
 import (
 	"fmt"
+	"github.com/ekoggy/Plum/postgre"
 	"log"
 	"net/http"
 	"text/template"
@@ -19,7 +20,7 @@ type htmlrecords struct {
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	var records []htmlrecords
-	rows, err := Database.Query("select * from database_leaks")
+	rows, err := postgre.Database.Query("select * from database_leaks")
 	if err != nil {
 		log.Println(err)
 	}

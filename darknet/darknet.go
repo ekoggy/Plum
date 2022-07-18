@@ -2,6 +2,7 @@ package darknet
 
 import (
 	"fmt"
+	"github.com/ekoggy/Plum/postgre"
 	"github.com/gocolly/colly/v2"
 	"github.com/gocolly/colly/v2/proxy"
 	"strconv"
@@ -41,7 +42,7 @@ func getSomeRecords(startRecord int, amount int) error {
 	var err error
 	for i := 0; i < amount; i++ {
 		// may be gorutine
-		var rec Record
+		var rec postgre.Record
 		err = scrubMainPage(&rec, startRecord-i)
 		if err != nil {
 			return err
@@ -54,12 +55,12 @@ func getSomeRecords(startRecord int, amount int) error {
 			amount++
 			continue
 		}
-		_, err = insert(rec.Name, rec.Size, rec.Date, rec.Price, rec.Buy, rec.Source)
+		_, err = postgre.Insert(rec.Name, rec.Size, rec.Date, rec.Price, rec.Buy, rec.Source)
 	}
 	return nil
 }
 
-func scrubMainPage(rec *Record, i int) error {
+func scrubMainPage(rec *postgre.Record, i int) error {
 	//creating collector
 	c := colly.NewCollector(colly.AllowURLRevisit())
 
@@ -98,7 +99,7 @@ func scrubMainPage(rec *Record, i int) error {
 	return nil
 }
 
-func scrubBuyPage(rec *Record, i int) error {
+func scrubBuyPage(rec *postgre.Record, i int) error {
 	//creating collector
 	c := colly.NewCollector(colly.AllowURLRevisit())
 

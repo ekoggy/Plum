@@ -1,5 +1,18 @@
 package postgre
 
+import "database/sql"
+
+type Record struct {
+	Name   string
+	Size   string
+	Date   string
+	Price  string
+	Buy    string
+	Source string
+}
+
+var Database *sql.DB
+
 func IsExist(Name string) (bool, error) {
 	response, err := Database.Query("SELECT EXISTS (SELECT * FROM database_leaks WHERE \"Name\" = $1)",
 		Name)
@@ -18,7 +31,7 @@ func IsExist(Name string) (bool, error) {
 
 }
 
-func insert(Name, Size, Date, Price, Buy, Source string) (int64, error) {
+func Insert(Name, Size, Date, Price, Buy, Source string) (int64, error) {
 	//check, err := IsExist(Name)
 	//if err != nil {
 	//	return 0, err

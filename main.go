@@ -3,26 +3,14 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"github.com/ekoggy/Plum/darknet"
+	"github.com/ekoggy/Plum/postgre"
+	"github.com/ekoggy/Plum/telegram"
+	"github.com/ekoggy/Plum/view"
 	_ "github.com/lib/pq"
 	"github.com/sasbury/mini"
 	"os"
-
-	"darknet"
-	"postgre"
-	"telegram"
-	"view"
 )
-
-type Record struct {
-	Name   string
-	Size   string
-	Date   string
-	Price  string
-	Buy    string
-	Source string
-}
-
-var Database *sql.DB
 
 func Fatal(v interface{}) {
 	fmt.Println(v)
@@ -58,24 +46,24 @@ func Params() string {
 func main() {
 	db, err := sql.Open("postgres", Params())
 	Chk(err)
-	Database = db
+	postgre.Database = db
 	defer db.Close()
 
-	_, err = Database.Exec("CREATE TABLE IF NOT EXISTS " +
+	_, err = postgre.Database.Exec("CREATE TABLE IF NOT EXISTS " +
 		`database_leaks(` +
 		`"Name" varchar(500),"Size" varchar(15), "Date" varchar(15),
 			 "Price" varchar(10), "Buy" varchar(500), "Source" varchar(500))`)
 	Chk(err)
 
 	go func() {
-		err = CollectInfoFromTelegram()
+		err = telegram.CollectInfoFromTelegram()
 		Chk(err)
 	}()
 	go func() {
-		err := CollectInfoFromDarknet()
+		err := darknet.CollectInfoFromDarknet()
 		Chk(err)
 	}()
-	err = LocalView()
+	err = view.LocalView()
 	if err != nil {
 		Chk(err)
 	}
