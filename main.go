@@ -34,11 +34,9 @@ func Params() string {
 		cfg.String("port", "5432"),
 		cfg.String("dbname", "postgres"),
 		cfg.String("sslmode", "disable"),
-		cfg.String("user", "Hacker"),
-		cfg.String("pass", "Compl3xity1_"),
+		cfg.String("user", "postgres"),
+		cfg.String("pass", ""),
 	)
-
-	fmt.Println(info)
 
 	return info
 }
