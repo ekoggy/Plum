@@ -30,12 +30,36 @@ func CollectInfoFromTelegram() error {
 		FileDirectory:       "./tdlib-files",
 		IgnoreFileNames:     false,
 	})
-	currentState, err := cli.Authorize()
-	if err != nil {
-		return err
-	}
-	for ; currentState.GetAuthorizationStateEnum() != tdlib.AuthorizationStateReadyType; currentState, _ = cli.Authorize() {
-		time.Sleep(300 * time.Millisecond)
+		for {
+		currentState, _ := client.Authorize()
+		if currentState.GetAuthorizationStateEnum() == tdlib.AuthorizationStateWaitPhoneNumberType {
+			fmt.Print("Enter phone: ")
+			var number string
+			fmt.Scanln(&number)
+			_, err := client.SendPhoneNumber(number)
+			if err != nil {
+				fmt.Printf("Error sending phone number: %v", err)
+			}
+		} else if currentState.GetAuthorizationStateEnum() == tdlib.AuthorizationStateWaitCodeType {
+			fmt.Print("Enter code: ")
+			var code string
+			fmt.Scanln(&code)
+			_, err := client.SendAuthCode(code)
+			if err != nil {
+				fmt.Printf("Error sending auth code : %v", err)
+			}
+		} else if currentState.GetAuthorizationStateEnum() == tdlib.AuthorizationStateWaitPasswordType {
+			fmt.Print("Enter Password: ")
+			var password string
+			fmt.Scanln(&password)
+			_, err := client.SendAuthPassword(password)
+			if err != nil {
+				fmt.Printf("Error sending auth password: %v", err)
+			}
+		} else if currentState.GetAuthorizationStateEnum() == tdlib.AuthorizationStateReadyType {
+			fmt.Println("Authorization Ready! Let's rock")
+			break
+		}
 	}
 
 	chat, err := cli.SearchPublicChat("TestDataBaseLeaks")
