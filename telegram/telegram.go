@@ -30,48 +30,25 @@ func CollectInfoFromTelegram() error {
 		FileDirectory:       "./tdlib-files",
 		IgnoreFileNames:     false,
 	})
-	for {
-		currentState, _ := client.Authorize()
-		if currentState.GetAuthorizationStateEnum() == tdlib.AuthorizationStateWaitPhoneNumberType {
-			fmt.Print("Enter phone: ")
-			var number string
-			fmt.Scanln(&number)
-			_, err := client.SendPhoneNumber(number)
-			if err != nil {
-				fmt.Printf("Error sending phone number: %v", err)
-			}
-		} else if currentState.GetAuthorizationStateEnum() == tdlib.AuthorizationStateWaitCodeType {
-			fmt.Print("Enter code: ")
-			var code string
-			fmt.Scanln(&code)
-			_, err := client.SendAuthCode(code)
-			if err != nil {
-				fmt.Printf("Error sending auth code : %v", err)
-			}
-		} else if currentState.GetAuthorizationStateEnum() == tdlib.AuthorizationStateWaitPasswordType {
-			fmt.Print("Enter Password: ")
-			var password string
-			fmt.Scanln(&password)
-			_, err := client.SendAuthPassword(password)
-			if err != nil {
-				fmt.Printf("Error sending auth password: %v", err)
-			}
-		} else if currentState.GetAuthorizationStateEnum() == tdlib.AuthorizationStateReadyType {
-			fmt.Println("Authorization Ready! Let's rock")
-			break
-		}
+	currentState, err := cli.Authorize()
+	if err != nil {
+		return err
 	}
-	//currentState, err := cli.Authorize()
-	//if err != nil {
-	//	return err
-	//}
-	//for ; currentState.GetAuthorizationStateEnum() != tdlib.AuthorizationStateReadyType; currentState, _ = cli.Authorize() {
-	//	time.Sleep(300 * time.Millisecond)
-	//}
+	for ; currentState.GetAuthorizationStateEnum() != tdlib.AuthorizationStateReadyType; currentState, _ = cli.Authorize() {
+		time.Sleep(300 * time.Millisecond)
+	}
 
-	last, err := cli.GetChatHistory(-1001678455451, 0, 0, 1, false)
+	chat, err := cli.SearchPublicChat("TestDataBaseLeaks")
+	if err != nil {
+		return err
+	}
 
-	msgs, err := cli.GetChatHistory(-1001678455451, last.Messages[0].ID, 0, 10, false)
+	last, err := cli.GetChatHistory(chat.ID, 0, 0, 1, false)
+	if err != nil {
+		return err
+	}
+
+	msgs, err := cli.GetChatHistory(chat.ID, last.Messages[0].ID, 0, 10, false)
 	if err != nil {
 		return err
 	}
@@ -86,7 +63,7 @@ func CollectInfoFromTelegram() error {
 	eventFilter := func(msg *tdlib.TdMessage) bool {
 		updateMsg := (*msg).(*tdlib.UpdateNewMessage)
 		if updateMsg.Message.IsChannelPost == true {
-			result := updateMsg.Message.ChatID == -1001678455451
+			result := updateMsg.Message.ChatID == chat.ID
 			return result
 		}
 		return false
