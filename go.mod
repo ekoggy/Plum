@@ -3,6 +3,7 @@ module github.com/ekoggy/Plum
 go 1.18
 
 require (
+	github.com/Arman92/go-tdlib v1.0.0
 	github.com/gocolly/colly/v2 v2.1.0
 	github.com/lib/pq v1.10.5
 	github.com/sasbury/mini v0.0.0-20181226232755-dc74af49394b
