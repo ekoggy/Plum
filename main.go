@@ -54,12 +54,16 @@ func main() {
 	Chk(err)
 
 	go func() {
-		err = telegram.CollectInfoFromTelegram()
-		Chk(err)
+		for{
+			err = telegram.CollectInfoFromTelegram()
+			fmt.Println("Telegram client have a error: ", err, "\nReconnecting")
+		}
 	}()
 	go func() {
-		err := darknet.CollectInfoFromDarknet()
-		Chk(err)
+		for{
+			err := darknet.CollectInfoFromDarknet()
+			fmt.Println("Darknet client have a error: ", err, "\nReconnecting")
+		}
 	}()
 	err = view.LocalView()
 	if err != nil {
