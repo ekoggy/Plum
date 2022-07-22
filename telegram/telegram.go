@@ -15,7 +15,7 @@ func CollectInfoFromTelegram() error {
 	client.SetFilePath("./errors.txt")
 	cli := client.NewClient(client.Config{
 		APIID:               "15728153",
-		APIHash:             " 7a959e9a1e68300cd6a1bbfcea3b7a96",
+		APIHash:             "7a959e9a1e68300cd6a1bbfcea3b7a96",
 		SystemLanguageCode:  "en",
 		DeviceModel:         "Server",
 		SystemVersion:       "1.0.0",
