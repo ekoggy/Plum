@@ -2,12 +2,10 @@ package telegram
 
 import (
 	"fmt"
-	"strings"
-	"time"
-
 	"github.com/ekoggy/Plum/postgre"
 	"github.com/kaoriEl/go-tdlib/client"
 	"github.com/kaoriEl/go-tdlib/tdlib"
+	"strings"
 )
 
 func CollectInfoFromTelegram() error {
@@ -16,8 +14,8 @@ func CollectInfoFromTelegram() error {
 	client.SetLogVerbosityLevel(1)
 	client.SetFilePath("./errors.txt")
 	cli := client.NewClient(client.Config{
-		APIID:               "187786",
-		APIHash:             "e782045df67ba48e441ccb105da8fc85",
+		APIID:               "15728153",
+		APIHash:             " 7a959e9a1e68300cd6a1bbfcea3b7a96",
 		SystemLanguageCode:  "en",
 		DeviceModel:         "Server",
 		SystemVersion:       "1.0.0",
@@ -30,12 +28,41 @@ func CollectInfoFromTelegram() error {
 		FileDirectory:       "./tdlib-files",
 		IgnoreFileNames:     false,
 	})
-	currentState, err := cli.Authorize()
-	if err != nil {
-		return err
-	}
-	for ; currentState.GetAuthorizationStateEnum() != tdlib.AuthorizationStateReadyType; currentState, _ = cli.Authorize() {
-		time.Sleep(300 * time.Millisecond)
+
+	for {
+		currentState, err := cli.Authorize()
+		if err != nil {
+			return err
+		}
+		fmt.Println(currentState)
+		if currentState.GetAuthorizationStateEnum() == tdlib.AuthorizationStateWaitPhoneNumberType {
+			fmt.Print("Enter phone: ")
+			var number string
+			fmt.Scanln(&number)
+			_, err := cli.SendPhoneNumber(number)
+			if err != nil {
+				fmt.Printf("Error sending phone number: %v", err)
+			}
+		} else if currentState.GetAuthorizationStateEnum() == tdlib.AuthorizationStateWaitCodeType {
+			fmt.Print("Enter code: ")
+			var code string
+			fmt.Scanln(&code)
+			_, err := cli.SendAuthCode(code)
+			if err != nil {
+				fmt.Printf("Error sending auth code : %v", err)
+			}
+		} else if currentState.GetAuthorizationStateEnum() == tdlib.AuthorizationStateWaitPasswordType {
+			fmt.Print("Enter Password: ")
+			var password string
+			fmt.Scanln(&password)
+			_, err := cli.SendAuthPassword(password)
+			if err != nil {
+				fmt.Printf("Error sending auth password: %v", err)
+			}
+		} else if currentState.GetAuthorizationStateEnum() == tdlib.AuthorizationStateReadyType {
+			fmt.Println("Authorization Ready! Let's rock")
+			break
+		}
 	}
 
 	chat, err := cli.SearchPublicChat("TestDataBaseLeaks")
@@ -63,7 +90,7 @@ func CollectInfoFromTelegram() error {
 	eventFilter := func(msg *tdlib.TdMessage) bool {
 		updateMsg := (*msg).(*tdlib.UpdateNewMessage)
 		if updateMsg.Message.IsChannelPost == true {
-			result := updateMsg.Message.ChatID == chat.ID
+			result := updateMsg.Message.ChatID == -1001678455451
 			return result
 		}
 		return false
