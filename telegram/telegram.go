@@ -60,15 +60,23 @@ func CollectInfoFromTelegram() error {
 				fmt.Printf("Error sending auth password: %v", err)
 			}
 		} else if currentState.GetAuthorizationStateEnum() == tdlib.AuthorizationStateReadyType {
-			fmt.Println("Authorization Ready! Let's rock")
 			break
 		}
 	}
 
 	chat, err := cli.JoinChatByInviteLink("t.me/+NFXmRDbSoYNhYTAy")
 	if err != nil {
-		return err
+		if err.Error() == "error! code: 400 msg: USER_ALREADY_PARTICIPANT" {
+			chat, err = cli.SearchPublicChat("TestDatabaseLeaks")
+			if err != nil {
+				return err
+			}
+		} else {
+			return err
+		}
 	}
+
+	fmt.Println(chat)
 
 	last, err := cli.GetChatHistory(chat.ID, 0, 0, 1, false)
 	if err != nil {
