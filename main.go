@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"github.com/ekoggy/Plum/darknet"
 	"github.com/ekoggy/Plum/postgre"
 	"github.com/ekoggy/Plum/telegram"
 	"github.com/ekoggy/Plum/view"
@@ -54,17 +53,17 @@ func main() {
 	Chk(err)
 
 	go func() {
-		for{
+		for {
 			err = telegram.CollectInfoFromTelegram()
 			fmt.Println("Telegram client have a error: ", err, "\nReconnecting")
 		}
 	}()
-	go func() {
-		for{
-			err := darknet.CollectInfoFromDarknet()
-			fmt.Println("Darknet client have a error: ", err, "\nReconnecting")
-		}
-	}()
+	//go func() {
+	//	for {
+	//		err := darknet.CollectInfoFromDarknet()
+	//		fmt.Println("Darknet client have a error: ", err, "\nReconnecting")
+	//	}
+	//}()
 	err = view.LocalView()
 	if err != nil {
 		Chk(err)

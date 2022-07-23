@@ -115,12 +115,8 @@ func fillTheRecord(rec *postgre.Record, msg *tdlib.MessagePhoto, cli *client.Cli
 	rec.Price = strings.Split(msg.Caption.Text, "\n")[3]
 	entity := fmt.Sprintf("%s", msg.Caption.Entities[1].Type)
 	rec.Buy = entity[27 : len(entity)-1]
-	link, err := cli.CreateChatInviteLink(-1001678455451, 0, 0)
-	if err != nil {
-		return err
-	}
-	rec.Source = link.InviteLink
-	_, err = postgre.Insert(rec.Name, rec.Size, rec.Date, rec.Price, rec.Buy, rec.Source)
+	rec.Source = "t.me/TestDataBaseLeaks"
+	_, err := postgre.Insert(rec.Name, rec.Size, rec.Date, rec.Price, rec.Buy, rec.Source)
 	if err != nil {
 		return err
 	}
