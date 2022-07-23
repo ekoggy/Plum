@@ -1,5 +1,6 @@
 # Установка
   Преджде чем приступать к установке данной утилиты, убедитесь, что на вашем ПК присутствуют:
+  - [Golang](https://go.dev/dl/)
   - PostgreSQL ([Postgre Documentation](https://www.postgresql.org/download/linux/ubuntu/))
   - Proxy-сервер от TOR, который поднят на 127.0.0.1:9050 ([Ubuntu documentation](https://help.ubuntu.ru/wiki/tor) до пункта "проверка")
   - Любой VPN сервис (при тестировании использовался [ProtonVPN](https://protonvpn.com/ru/))
