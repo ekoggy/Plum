@@ -5,12 +5,12 @@ all:
 	rm -rf build &&\
 	mkdir build &&\
 	cd build &&\
-	cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=/usr/local .. &&\
-	cmake --build . --target prepare_cross_compiling &&\
+	sudo cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=/usr/local .. &&\
+	sudo cmake --build . --target prepare_cross_compiling &&\
 	cd .. &&\
 	php SplitSource.php &&\
 	cd build &&\
-	cmake --build . --target install &&\
+	sudo cmake --build . --target install &&\
 	cd .. &&\
 	php SplitSource.php --undo &&\
 	go build main.go
