@@ -65,7 +65,7 @@ func CollectInfoFromTelegram() error {
 		}
 	}
 
-	chat, err := cli.SearchPublicChat("TestDataBaseLeaks")
+	chat, err := cli.JoinChatByInviteLink("t.me/+NFXmRDbSoYNhYTAy")
 	if err != nil {
 		return err
 	}
@@ -115,7 +115,7 @@ func fillTheRecord(rec *postgre.Record, msg *tdlib.MessagePhoto, cli *client.Cli
 	rec.Price = strings.Split(msg.Caption.Text, "\n")[3]
 	entity := fmt.Sprintf("%s", msg.Caption.Entities[1].Type)
 	rec.Buy = entity[27 : len(entity)-1]
-	rec.Source = "t.me/TestDataBaseLeaks"
+	rec.Source = "t.me/TestDatabaseLeaks"
 	_, err := postgre.Insert(rec.Name, rec.Size, rec.Date, rec.Price, rec.Buy, rec.Source)
 	if err != nil {
 		return err
