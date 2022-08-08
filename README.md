@@ -1,21 +1,35 @@
 # Установка
-  Прежде, чем приступать к установке данной утилиты, убедитесь, что на вашем ПК присутствуют:
-  - Установите Golang на вашу систему.
+  Для работы утилиты необходимо установить несколько важных компонентов: goland, PostgreSQL, Tor-proxy и VPN.
+### Golang
+  Для установки компилятора для golang достаточно выполнить соответствующую команду.
 ``` 
   sudo apt install golang
 ``` 
-  - Произведите установку PostgreSQL.
+### PostgreSQL
+  Установка данной системы несколько сложнее. Для начала нужно создать конфигурация для репозитория.
 ```
 sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+```
+Затем необходимо произвести импортировать ключ подписи репозитория.
+```
 wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+```
+Обновляем списки пакетов и, наконец, устанавливаем среду.
+```
 sudo apt-get update
 sudo apt-get -y install postgresql
 ```
-  - Proxy-сервер от TOR, который поднят на 127.0.0.1:9050 ([Ubuntu documentation](https://help.ubuntu.ru/wiki/tor) до пункта "проверка")
+### Proxy-сервер
+  Устанавливаем необходимые пакеты.
 ```
-sudo apt-get install tor tor-geoipdb privoxy 
+sudo apt-get install tor tor-geoipdb privoxy
+```
+Открываем для редактирования конфигурацию proxy-сервера.
+```
 sudo gedit /etc/privoxy/config
+```
 Вставляем следующее и сохраняем:
+```
 confdir /etc/privoxy
 logdir /var/log/privoxy
 # actionsfile standard  # Internal purpose, recommended
@@ -37,8 +51,14 @@ enable-edit-actions 0
 enable-remote-http-toggle 0
 buffer-limit 4096
 ```
-  - Любой VPN сервис (при тестировании использовался [ProtonVPN](https://protonvpn.com/ru/))
+Перезапустим службу:
+```
+ sudo service privoxy restart 
+ ```
+### VPN
+  Для работы можно использовать абсолютно любой VPN, например, при тестировании использовался [ProtonVPN](https://protonvpn.com/ru/).
             
+### Утилита
 При наличии всех компонентов скачайте/импортируйте/клонируйте репозиторий в необходимую вам среду.
     Важным для внимания является файл config.ini, в котором содержатся данные о пользователе, собирающем данные. Отредактируйте файл в соответствии с вашим настроенным пользователем.
     В момент, когда вы имеете правильный config.ini и исходный код программы, запустите на своем ПК proxy-сервер от TOR, VPN и пропишите в косоли `make`, после чего получите .ехе файл, готовый к работе (в процессе создания исполняемого файла будет скачиваться и устанавливаться TelegramAPI, поэтому рекомендую запастись терпением и чаем) 
