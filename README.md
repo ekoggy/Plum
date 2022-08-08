@@ -1,8 +1,42 @@
 # Установка
   Прежде, чем приступать к установке данной утилиты, убедитесь, что на вашем ПК присутствуют:
-  - [Golang](https://go.dev/dl/)
-  - PostgreSQL ([Postgre Documentation](https://www.postgresql.org/download/linux/ubuntu/))
+  - Установите Golang на вашу систему.
+``` 
+  sudo apt install golang
+``` 
+  - Произведите установку PostgreSQL.
+```
+sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+sudo apt-get update
+sudo apt-get -y install postgresql
+```
   - Proxy-сервер от TOR, который поднят на 127.0.0.1:9050 ([Ubuntu documentation](https://help.ubuntu.ru/wiki/tor) до пункта "проверка")
+```
+sudo apt-get install tor tor-geoipdb privoxy 
+sudo gedit /etc/privoxy/config
+Вставляем следующее и сохраняем:
+confdir /etc/privoxy
+logdir /var/log/privoxy
+# actionsfile standard  # Internal purpose, recommended
+actionsfile default.action   # Main actions file
+actionsfile user.action      # User customizations
+filterfile default.filter
+ 
+logfile logfile
+#jarfile jarfile
+#debug   0    # show each GET/POST/CONNECT request
+debug   4096 # Startup banner and warnings
+debug   8192 # Errors - *we highly recommended enabling this*
+ 
+user-manual /usr/share/doc/privoxy/user-manual
+listen-address  127.0.0.1:8118
+toggle  1
+enable-remote-toggle 0
+enable-edit-actions 0
+enable-remote-http-toggle 0
+buffer-limit 4096
+```
   - Любой VPN сервис (при тестировании использовался [ProtonVPN](https://protonvpn.com/ru/))
             
 При наличии всех компонентов скачайте/импортируйте/клонируйте репозиторий в необходимую вам среду.
@@ -26,7 +60,7 @@
    - Создание нового клиента - используется функция NewClient, которая и возвращает указатель на новый объект, принимающий данные
    - Авторизация - использование Authorize, которая выполняет передачу параметров пользователя и авторизацию
    - Считывание старых сообщений - GetChatHistory позволила считать N сообщений, начиная с последнего
-   - Установка фильтра - написание функции проверки ID чата обновления, и отброс всех ненужных
+   - Установка фильтра - написание функции фильтрации приходящих обновлений посредством проверки ID чата, из которого обновление пришло
    - Мониторинг обновлений - создание ресивера при помощи AddEventReceiver, который мониторит события, указанные нами
 3. Считывание данных из Darknet происходит по следующему алгоритму:
    - Создание коллектора - при помощи одноименной функции создается коллектор (оператор, который обращается к сайту и хранит его ответы на запросы)
